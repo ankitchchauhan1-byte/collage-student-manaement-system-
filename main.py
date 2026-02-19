@@ -1,4 +1,5 @@
-
+import pandas as pd
+import numpy as np
 import mysql.connector 
 try:
     conn=mysql.connector.connect(host="localhost",user="root",password="mysql1234",database="collage")
@@ -32,7 +33,7 @@ class Record_Office:
         self.address=None
 
        
-        #self.data()
+        self.data()
     def fee (self):
         if self.course=="btech":
             self.total_fee=100000
@@ -297,38 +298,187 @@ class Record_Office:
         else:
 
             print("somthing went wrong. Try again")
-        cursor.execute("""create table student1 (
-        "                )""")
+        
+# c1=Record_Office()
 class Hod(Record_Office):
 
 
     def __init__(self):
-        self.roll_no=''
-        super().__init__(self.data1())
-        # super().__init__(self.name)
-        # super().__init__(self.course)
-        # super().__init__(self.left_fee)
-        # super().__init__(self.father_name)
-        # super().__init__(self.mobile_no)
+       
+        query="select*from student "
+        data=pd.read_sql(query,conn)
+        data.drop(["fee","year","paid_fee","gender","date_of_birth","email","mother_name"],axis=1,inplace=True)
         
-        self.attandence=''
-        self.department=''
-        self.session_1=''
-        self.session_2=''
-        self.mid_term=''
-    def data1(self):
-        user2=input("""enter your choice
-                    1.'view single student  detail' to view student all detail 
-                    2. 'view all student detail' to check the full list of student  
-                    3. 'department' to add the department of student 
-                    
-                   """)
-        if user2=="attadence":
+        data=data.sort_values(by="name").reset_index(drop=True)
+        data.index+=1
+        data["session1"]=None
+        data["session2"]=None
+        data["mid_term"]=None
+        print(data)
+        data.to_excel('student_under_hod.xlsx',index=True)
+    def get_data(self):
+        user =input("")
+# c=Hod()
+class class_teacher(Hod):
+    def __init__(self):
+        self.data_entry()
+        # self.class_teacher_load_file()
+        
+
+    def hod_load_file(self):
+        self.df=pd.read_excel("student_under_hod.xlsx",engine="openpyxl")
+        self.df.index+=1
+
+    def class_teacher_load_file(self):
+        self.df=pd.read_excel("student_under_hod.xlsx",engine="openpyxl")
+        self.df.drop(["registation_no","course","left_fee","address","mobile_no"],axis=1,inplace=True)
+        self.df.index = self.df.index + 1
+        print(self.df)
+        
+    def data_entry(self):
+        
+        user=input("""press 'sesssion1' to enter session1 marks
+                      press 'session2' to enter session2 marks
+                      press 'mid_term' to enter mid_term marks
+                      enter your choice:  """) 
+        if user =="session1":
             
-            cursor.execute("select address from student where roll_no")
-            user=input("enter attendecnce percentage ")
-            sql="insert into student1 (roll_no,registation_no,name ,left_fee,father_name,mobile_no ,attandence,department,session_1,seesion_2,mid_term) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            data =(self.registation_no,self.name,self.left_fee,self.father_name,self.mobile_no,self.attandence,self.department,self.session_1,self.session_2,self.mid_term)
-            cursor.execute(sql,data)
-            conn.commit()
-c=Hod()
+            
+            user1=int(input("""to enter marks at a particular position press "0"
+                            to enter marks of all student "1"  """))
+            
+            self.class_teacher_load_file()
+            
+            if user1==0:
+                try:
+                    self.hod_load_file()
+                    roll_no=int(input("enter roll_no"))
+                    
+                    if roll_no in self.df.index:
+                        marks=int(input("enter student marks"))
+                        
+                        self.df.loc[roll_no,"session1"]=marks
+                        print("marks updaate successfully")
+                        self.df.to_excel("student_under_hod.xlsx", index=False)
+                        
+                        
+                    else:
+                        print("invalid roll_no")
+                     
+                except Exception as e:
+                    print(e)
+                
+            else:
+                try:
+                    self.hod_load_file()
+                    for i in self.df.index:
+                        
+                        self.value=input("enter session1 marks for row {i} (a) for absent ")
+                        if self.value.lower()=="a":
+
+                            self.df.loc[i,"session1"]=np.nan
+                            continue
+                        self.df.loc[i,"session1"]=int(self.value)
+                    self.df.to_excel("student_under_hod.xlsx",index=False)
+                        
+                    
+                except:
+                    print("student marks already enter ")
+        elif user=="session2":
+              
+           user1=int(input("""to enter marks at a particular position press "0"
+                            to enter marks of all student "1"  """))
+            
+           self.class_teacher_load_file()
+            
+           if user1==0:
+                try:
+                    self.hod_load_file()
+                    roll_no=int(input("enter roll_no"))
+                    
+                    if roll_no in self.df.index:
+                        marks=int(input("enter student marks"))
+                        
+                        self.df.loc[roll_no,"session2"]=marks
+                        print("marks updaate successfully")
+                        self.df.to_excel("student_under_hod.xlsx", index=False)
+                        
+                        
+                    else:
+                        print("invalid roll_no")
+                     
+                except Exception as e:
+                    print(e)
+                
+           else:
+                try:
+                    self.hod_load_file()
+                    for i in self.df.index:
+                        
+                        self.value=input("enter session2 marks for row {i} (a) for absent ")
+                        if self.value.lower()=="a":
+
+                            self.df.loc[i,"session2"]=np.nan
+                            continue
+                        self.df.loc[i,"session2"]=int(self.value)
+                    self.df.to_excel("student_under_hod.xlsx",index=False)
+                        
+                    
+                except:
+                    print("student marks already enter ")
+         
+            
+        elif user=="mid_term":
+              
+          user1=int(input("""to enter marks at a particular position press "0"
+                            to enter marks of all student "1"  """))
+            
+          self.class_teacher_load_file()
+            
+          if user1==0:
+                try:
+                    self.hod_load_file()
+                    roll_no=int(input("enter roll_no"))
+                    
+                    if roll_no in self.df.index:
+                        marks=int(input("enter student marks"))
+                        
+                        self.df.loc[roll_no,"mid_term"]=marks
+                        print("marks updaate successfully")
+                        self.df.to_excel("student_under_hod.xlsx", index=False)
+                        
+                        
+                    else:
+                        print("invalid roll_no")
+                     
+                except Exception as e:
+                    print(e)
+                
+          else:
+                try:
+                    self.hod_load_file()
+                    for i in self.df.index:
+                        
+                        self.value=input("enter mid_term marks for row {i} (a) for absent ")
+                        if self.value.lower()=="a":
+
+                            self.df.loc[i,"mid_term"]=np.nan
+                            continue
+                        self.df.loc[i,"mid_term"]=int(self.value)
+                    self.df.to_excel("student_under_hod.xlsx",index=False)
+                        
+                    
+                except:
+                    print("student marks already enter ")
+
+            
+        else:
+            print("somthing went wrong. try again")
+     
+ 
+c=class_teacher()
+
+
+         
+
+
