@@ -2,17 +2,36 @@ import pandas as pd
 import numpy as np
 import mysql.connector 
 try:
-    conn=mysql.connector.connect(host="localhost",user="root",password="mysql1234",database="collage")
+    conn=mysql.connector.connect(host="localhost",user="root",password="mysql1234")
+    cursor=conn.cursor()
+    cursor.execute("create database if not exists collage")
+    cursor.execute("use collage")
+    
 
    
-except :
-    print("inable to connect")
-cursor=conn.cursor()
+except Exception as e :
+    print("unable to connect database",e)
+# cursor=conn.cursor()
+# cursor.execute("create database if not exists collage")
+# cursor.execute("use collage")
 
-      
-
-
-
+cursor.execute("""create table if not exists student(
+                registation_no int primary key,
+                name varchar(50),
+                fee float(10,2),
+                course varchar(50),
+                year varchar(20),
+                left_fee float(10,2),
+                paid_fee float(10,2),
+                gender varchar(50),
+                date_of_birth date,
+                email varchar(150),
+                address varchar(500),
+                father_name varchar(150),
+                mother_name varchar(150),
+                mobile_no bigint check (mobile_no between 1000000000 and 9999999999)
+               )""")
+               
 class Record_Office:
 
     
@@ -298,8 +317,8 @@ class Record_Office:
         else:
 
             print("somthing went wrong. Try again")
-        
-# c1=Record_Office()
+ 
+c1=Record_Office()
 class Hod(Record_Office):
 
 
@@ -476,7 +495,7 @@ class class_teacher(Hod):
             print("somthing went wrong. try again")
      
  
-c=class_teacher()
+# c=class_teacher()
 
 
          
